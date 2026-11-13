@@ -1,4 +1,6 @@
 *.png
+# Allow verified application screenshots in portfolio documentation.
+!docs/screenshots/*.png
 
 # Dependencies
 node_modules/
