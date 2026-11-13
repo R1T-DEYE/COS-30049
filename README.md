@@ -14,6 +14,20 @@ The repository contains the application, serialized model files, and the Python 
 
 > **Educational prototype:** This is not a production phishing or malware detection system. A clean verdict does not establish that a link or message is safe.
 
+## Screenshots
+
+Captured from the running React and FastAPI application with the **included trained models**. The displayed scans use synthetic example messages in a temporary SQLite database; verdicts and statistics are genuine outputs of the project code, not manually designed mockups.
+
+**Email classification**
+
+![Spam detector displaying an actual model prediction for an example message](docs/screenshots/scan-result.png)
+
+**Scan statistics**
+
+![Statistics dashboard with a stacked bar chart, label ratio, and prediction confidence histogram](docs/screenshots/statistics.png)
+
+[Additional screenshot: home dashboard](docs/screenshots/home.png).
+
 ## Technology
 
 | Component | Libraries / tools |
