@@ -1,0 +1,47 @@
+name: Capture ML dashboard screenshots (temporary)
+
+on:
+  push:
+    branches:
+      - docs/real-application-screenshots-2026-11-13
+
+permissions:
+  contents: write
+
+jobs:
+  screenshots:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install backend and frontend dependencies
+        run: |
+          python -m pip install fastapi==0.121.0 uvicorn==0.38.0 sqlmodel==0.0.27 scikit-learn==1.7.2 joblib==1.5.2
+          npm ci --prefix FrontEnd
+          npm install --no-save --prefix /tmp/pw playwright@1.56.1
+          /tmp/pw/node_modules/.bin/playwright install chromium --with-deps
+      - name: Start real application
+        run: |
+          cd BackEnd
+          DATABASE_URL=sqlite:///./spam_screenshot.db python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 > /tmp/cos-api.log 2>&1 &
+          cd ../FrontEnd
+          npm run dev -- --host 127.0.0.1 > /tmp/cos-vite.log 2>&1 &
+      - name: Render screenshots using actual models
+        run: node scripts/capture-ml-dashboard.cjs
+      - name: Print diagnostics on failure
+        if: failure()
+        run: |
+          tail -120 /tmp/cos-api.log || true
+          tail -120 /tmp/cos-vite.log || true
+      - name: Commit screenshots to preview branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/screenshots
+          git commit -m "docs: capture genuine ML dashboard images [skip ci]"
+          git push origin HEAD:refs/heads/docs/real-application-screenshots-2026-11-13
